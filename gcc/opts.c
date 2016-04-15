@@ -577,7 +577,8 @@ default_options_optimization (struct gcc_options *opts,
 	case OPT_O:
 	  if (*opt->arg == '\0')
 	    {
-	      opts->x_optimize = 1;
+	      if (opts->x_optimize == 0)
+	      	opts->x_optimize = 1;
 	      opts->x_optimize_size = 0;
 	      opts->x_optimize_fast = 0;
 	      opts->x_optimize_debug = 0;
@@ -590,7 +591,12 @@ default_options_optimization (struct gcc_options *opts,
 			       "integer, %<g%>, %<s%> or %<fast%>");
 	      else
 		{
-		  opts->x_optimize = optimize_val;
+		  /* Keep higher opts value */
+		  if (optimize_val > opts->x_optimize)
+		    opts->x_optimize = optimize_val;
+		  /* But honors 0 opts  */
+		  if (optimize_val == 0)
+		    opts->x_optimize = optimize_val;
 		  if ((unsigned int) opts->x_optimize > 255)
 		    opts->x_optimize = 255;
 		  opts->x_optimize_size = 0;
