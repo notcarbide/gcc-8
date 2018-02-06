@@ -125,4 +125,11 @@ enum instrument_return {
   instrument_return_nop5
 };
 
+enum zero_caller_saved_regs {
+  zero_caller_saved_regs_unset = 0,
+  zero_caller_saved_regs_skip,
+  zero_caller_saved_regs_used,
+  zero_caller_saved_regs_all
+};
+
 #endif

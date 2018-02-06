@@ -1101,3 +1101,20 @@ Enum(instrument_return) String(nop5) Value(instrument_return_nop5)
 mrecord-return
 Target Report Var(ix86_flag_record_return) Init(0)
 Generate a __return_loc section pointing to all return instrumentation code.
+
+mzero-caller-saved-regs=
+Target Report RejectNegative Joined Enum(zero_caller_saved_regs) Var(ix86_zero_caller_saved_regs) Init(zero_caller_saved_regs_skip)
+Clear caller-saved general registers upon function return.
+
+Enum
+Name(zero_caller_saved_regs) Type(enum zero_caller_saved_regs)
+Known choices of clearing caller-saved general registers upon function return (for use with the -mzero-caller-saved-regs= option):
+
+EnumValue
+Enum(zero_caller_saved_regs) String(skip) Value(zero_caller_saved_regs_skip)
+
+EnumValue
+Enum(zero_caller_saved_regs) String(used) Value(zero_caller_saved_regs_used)
+
+EnumValue
+Enum(zero_caller_saved_regs) String(all) Value(zero_caller_saved_regs_all)
