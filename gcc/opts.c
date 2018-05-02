@@ -708,6 +708,15 @@ finish_options (struct gcc_options *opts, struct gcc_options *opts_set,
 {
   enum unwind_info_type ui_except;
 
+  /* openmp to imply tree vectorize */
+  if (opts->x_flag_openmp && opts->x_optimize >=2) {
+   opts->x_flag_tree_loop_vectorize = 1;
+   opts->x_optimize = 3;
+   opts->x_flag_gcse_after_reload = 1;
+   opts->x_flag_dse = 1;
+   opts->x_flag_schedule_insns = 1;
+  }
+
   if (opts->x_dump_base_name
       && ! opts->x_dump_base_name_prefixed)
     {
