@@ -88,6 +88,9 @@ gfc_init_options_struct (struct gcc_options *opts)
   opts->frontend_set_flag_errno_math = true;
   opts->x_flag_associative_math = -1;
   opts->frontend_set_flag_associative_math = true;
+  opts->x_flag_tree_loop_vectorize = 1;
+  //opts->x_ix86_isa_flags |= OPTION_MASK_ISA_AVX;
+  //opts->x_ix86_isa_flags_explicit |= OPTION_MASK_ISA_AVX;
 }
 
 /* Get ready for options handling. Keep in sync with
