@@ -2622,6 +2622,174 @@ make_pass_insert_endbranch (gcc::context *ctxt)
   return new pass_insert_endbranch (ctxt);
 }
 
+/* At function entry, generate a single
+	vxorps %xmmN, %xmmN, %xmmN
+   for all
+	vcvtss2sd  op, %xmmN, %xmmX
+	vcvtsd2ss  op, %xmmN, %xmmX
+	vcvtsi2ss  op, %xmmN, %xmmX
+	vcvtsi2sd  op, %xmmN, %xmmX
+ */
+
+static unsigned int
+remove_partial_avx_dependency (void)
+{
+  timevar_push (TV_MACH_DEP);
+
+  calculate_dominance_info (CDI_DOMINATORS);
+  df_set_flags (DF_DEFER_INSN_RESCAN);
+  df_chain_add_problem (DF_DU_CHAIN | DF_UD_CHAIN);
+  df_md_add_problem ();
+  df_analyze ();
+
+  basic_block bb;
+  rtx_insn *insn, *set_insn;
+  rtx set;
+  rtx v4sf_const0 = NULL_RTX;
+
+  FOR_EACH_BB_FN (bb, cfun)
+    {
+      FOR_BB_INSNS (bb, insn)
+	{
+	  if (!NONDEBUG_INSN_P (insn))
+	    continue;
+
+	  set = single_set (insn);
+	  if (set)
+	    {
+	      machine_mode dest_vecmode, dest_mode;
+	      rtx src = SET_SRC (set);
+	      rtx dest, vec, zero;
+
+	      /* Check for conversions to SF or DF.  */
+	      switch (GET_CODE (src))
+		{
+		case FLOAT_TRUNCATE:
+		  /* DF -> SF.  */
+		  if (GET_MODE (XEXP (src, 0)) != DFmode)
+		    continue;
+		  /* Fall through.  */
+		case FLOAT_EXTEND:
+		  /* SF -> DF.  */
+		case FLOAT:
+		  /* SI -> SF, SI -> DF, DI -> SF, DI -> DF.  */
+		  dest = SET_DEST (set);
+		  dest_mode = GET_MODE (dest);
+		  switch (dest_mode)
+		    {
+		    case E_SFmode:
+		      dest_vecmode = V4SFmode;
+		      break;
+		    case E_DFmode:
+		      dest_vecmode = V2DFmode;
+		      break;
+		    default:
+		      continue;
+		    }
+
+		  if (!TARGET_64BIT
+		      && GET_MODE (XEXP (src, 0)) == DImode)
+		    continue;
+
+		  if (!v4sf_const0)
+		    v4sf_const0 = gen_reg_rtx (V4SFmode);
+
+		  if (dest_vecmode == V4SFmode)
+		    zero = v4sf_const0;
+		  else
+		    zero = gen_rtx_SUBREG (V2DFmode, v4sf_const0, 0);
+
+		  /* Change source to vector mode.  */
+		  src = gen_rtx_VEC_DUPLICATE (dest_vecmode, src);
+		  src = gen_rtx_VEC_MERGE (dest_vecmode, src, zero,
+					   GEN_INT (HOST_WIDE_INT_1U));
+		  /* Change destination to vector mode.  */
+		  vec = gen_reg_rtx (dest_vecmode);
+		  /* Generate a XMM vector SET.  */
+		  set = gen_rtx_SET (vec, src);
+		  set_insn = emit_insn_before (set, insn);
+		  df_insn_rescan (set_insn);
+
+		  src = gen_rtx_SUBREG (dest_mode, vec, 0);
+		  set = gen_rtx_SET (dest, src);
+
+		  /* Drop possible dead definitions.  */
+		  PATTERN (insn) = set;
+
+		  INSN_CODE (insn) = -1;
+		  recog_memoized (insn);
+		  df_insn_rescan (insn);
+		  break;
+
+		default:
+		  break;
+		}
+	    }
+	}
+    }
+
+  if (v4sf_const0)
+    {
+      /* Generate a single vxorps at function entry and preform df
+	 rescan. */
+      bb = ENTRY_BLOCK_PTR_FOR_FN (cfun)->next_bb;
+      insn = BB_HEAD (bb);
+      set = gen_rtx_SET (v4sf_const0, CONST0_RTX (V4SFmode));
+      set_insn = emit_insn_after (set, insn);
+      df_insn_rescan (set_insn);
+      df_process_deferred_rescans ();
+    }
+
+  timevar_pop (TV_MACH_DEP);
+  return 0;
+}
+
+namespace {
+
+const pass_data pass_data_remove_partial_avx_dependency =
+{
+  RTL_PASS, /* type */
+  "rpad", /* name */
+  OPTGROUP_NONE, /* optinfo_flags */
+  TV_MACH_DEP, /* tv_id */
+  0, /* properties_required */
+  0, /* properties_provided */
+  0, /* properties_destroyed */
+  0, /* todo_flags_start */
+  TODO_df_finish, /* todo_flags_finish */
+};
+
+class pass_remove_partial_avx_dependency : public rtl_opt_pass
+{
+public:
+  pass_remove_partial_avx_dependency (gcc::context *ctxt)
+    : rtl_opt_pass (pass_data_remove_partial_avx_dependency, ctxt)
+  {}
+
+  /* opt_pass methods: */
+  virtual bool gate (function *)
+    {
+      return (TARGET_AVX
+	      && TARGET_SSE_PARTIAL_REG_DEPENDENCY
+	      && TARGET_SSE_MATH
+	      && optimize
+	      && optimize_function_for_speed_p (cfun));
+    }
+
+  virtual unsigned int execute (function *)
+    {
+      return remove_partial_avx_dependency ();
+    }
+}; // class pass_rpad
+
+} // anon namespace
+
+rtl_opt_pass *
+make_pass_remove_partial_avx_dependency (gcc::context *ctxt)
+{
+  return new pass_remove_partial_avx_dependency (ctxt);
+}
+
 /* Return true if a red-zone is in use.  We can't use red-zone when
    there are local indirect jumps, like "indirect_jump" or "tablejump",
    which jumps to another place in the function, since "call" in the
