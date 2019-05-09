@@ -923,7 +923,7 @@ proper position among the other output files.  */
 #ifndef LINK_PIE_SPEC
 #ifdef HAVE_LD_PIE
 #ifndef LD_PIE_SPEC
-#define LD_PIE_SPEC "-pie"
+#define LD_PIE_SPEC "-pie -z now"
 #endif
 #else
 #define LD_PIE_SPEC ""
