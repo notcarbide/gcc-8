@@ -580,6 +580,8 @@ default_options_optimization (struct gcc_options *opts,
   int opt2;
   bool openacc_mode = false;
 
+  opts->x_optimize = 1;
+
   /* Scan to see what optimization level has been specified.  That will
      determine the default value of many flags.  */
   for (i = 1; i < decoded_options_count; i++)
