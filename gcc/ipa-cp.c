@@ -619,6 +619,10 @@ determine_versionability (struct cgraph_node *node,
 	 coexist, but that may not be worth the effort.  */
       reason = "function target_clones attribute";
     }
+  else if (lookup_attribute ("target_clones", DECL_ATTRIBUTES (node->decl)))
+    {
+      reason = "function target_clones attribute";
+    }
   /* Don't clone decls local to a comdat group; it breaks and for C++
      decloned constructors, inlining is always better anyway.  */
   else if (node->comdat_local_p ())
