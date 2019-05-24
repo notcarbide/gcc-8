@@ -57,7 +57,10 @@ static inline int do_spin (int *addr, int val)
     if (__builtin_expect (__atomic_load_n (addr, MEMMODEL_RELAXED) != val, 0))
       return 0;
     else
-      cpu_relax ();
+      if (i < count/2) 
+	       __asm__ __volatile__("nop\nnop\nnop\nnop\nvzeroall\n": : :"memory");
+      else
+	      cpu_relax ();
   return 1;
 }
 
