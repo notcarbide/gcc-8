@@ -35030,6 +35030,7 @@ ix86_expand_args_builtin (const struct builtin_description *d,
     case V16QI_FTYPE_V8DI_V16QI_UQI:
     case V16SF_FTYPE_V16SF_V16SF_UHI:
     case V16SF_FTYPE_V4SF_V16SF_UHI:
+    case V16SF_FTYPE_FLOAT_V16SF_UHI:
     case V16SI_FTYPE_SI_V16SI_UHI:
     case V16SI_FTYPE_V16HI_V16SI_UHI:
     case V16SI_FTYPE_V16QI_V16SI_UHI:
@@ -35109,6 +35110,7 @@ ix86_expand_args_builtin (const struct builtin_description *d,
     case V4SI_FTYPE_V16QI_V4SI_UQI:
     case V4DI_FTYPE_V4DI_V4DI_V4DI:
     case V8DF_FTYPE_V2DF_V8DF_UQI:
+    case V8DF_FTYPE_DOUBLE_V8DF_UQI:
     case V8DF_FTYPE_V4DF_V8DF_UQI:
     case V8DF_FTYPE_V8DF_V8DF_UQI:
     case V8SF_FTYPE_V8SF_V8SF_UQI:
@@ -47138,49 +47140,62 @@ expand_vec_perm_1 (struct expand_vec_perm_d *d)
 	{
 	  /* Use vpbroadcast{b,w,d}.  */
 	  rtx (*gen) (rtx, rtx) = NULL;
+	  machine_mode scalar_mode;
 	  switch (d->vmode)
 	    {
 	    case E_V64QImode:
+	      scalar_mode = QImode;
 	      if (TARGET_AVX512BW)
-		gen = gen_avx512bw_vec_dupv64qi_1;
+		gen = gen_avx512bw_vec_dupv64qi;
 	      break;
 	    case E_V32QImode:
-	      gen = gen_avx2_pbroadcastv32qi_1;
+	      scalar_mode = QImode;
+	      gen = gen_avx2_pbroadcastv32qi;
 	      break;
 	    case E_V32HImode:
+	      scalar_mode = HImode;
 	      if (TARGET_AVX512BW)
-		gen = gen_avx512bw_vec_dupv32hi_1;
+		gen = gen_avx512bw_vec_dupv32hi;
 	      break;
 	    case E_V16HImode:
-	      gen = gen_avx2_pbroadcastv16hi_1;
+	      scalar_mode = HImode;
+	      gen = gen_avx2_pbroadcastv16hi;
 	      break;
 	    case E_V16SImode:
+	      scalar_mode = SImode;
 	      if (TARGET_AVX512F)
-		gen = gen_avx512f_vec_dupv16si_1;
+		gen = gen_avx512f_vec_dupv16si;
 	      break;
 	    case E_V8SImode:
-	      gen = gen_avx2_pbroadcastv8si_1;
+	      scalar_mode = SImode;
+	      gen = gen_avx2_pbroadcastv8si;
 	      break;
 	    case E_V16QImode:
+	      scalar_mode = QImode;
 	      gen = gen_avx2_pbroadcastv16qi;
 	      break;
 	    case E_V8HImode:
+	      scalar_mode = HImode;
 	      gen = gen_avx2_pbroadcastv8hi;
 	      break;
 	    case E_V16SFmode:
+	      scalar_mode = SFmode;
 	      if (TARGET_AVX512F)
-		gen = gen_avx512f_vec_dupv16sf_1;
+		gen = gen_avx512f_vec_dupv16sf;
 	      break;
 	    case E_V8SFmode:
-	      gen = gen_avx2_vec_dupv8sf_1;
+	      scalar_mode = SFmode;
+	      gen = gen_vec_dupv8sf;
 	      break;
 	    case E_V8DFmode:
+	      scalar_mode = DFmode;
 	      if (TARGET_AVX512F)
-		gen = gen_avx512f_vec_dupv8df_1;
+		gen = gen_avx512f_vec_dupv8df;
 	      break;
 	    case E_V8DImode:
+	      scalar_mode = DImode;
 	      if (TARGET_AVX512F)
-		gen = gen_avx512f_vec_dupv8di_1;
+		gen = gen_avx512f_vec_dupv8di;
 	      break;
 	    /* For other modes prefer other shuffles this function creates.  */
 	    default: break;
@@ -47188,7 +47203,18 @@ expand_vec_perm_1 (struct expand_vec_perm_d *d)
 	  if (gen != NULL)
 	    {
 	      if (!d->testing_p)
-		emit_insn (gen (d->target, d->op0));
+		{
+		  rtx op = d->op0;
+		  unsigned int oppos = 0;
+		  if (SUBREG_P (op))
+		    {
+		      op = SUBREG_REG (op);
+		      oppos = SUBREG_BYTE (op);
+		    }
+		  emit_insn (gen (d->target,
+				  gen_rtx_SUBREG (scalar_mode,
+						  op, oppos)));
+		}
 	      return true;
 	    }
 	}
