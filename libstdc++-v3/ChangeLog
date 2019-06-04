@@ -1,3 +1,21 @@
+2019-06-03  Jonathan Wakely  <jwakely@redhat.com>
+
+	PR libstdc++/90700
+	* include/std/tuple
+	(tuple(allocator_arg_t, const A&, const tuple<UTypes...>&)): Fix
+	value category of template argument to _TC::_NonNestedTuple.
+	* testsuite/20_util/tuple/cons/90700.cc: New test.
+
+	PR libstdc++/90686
+	* doc/xml/manual/status_cxx2014.xml: Document what's missing from
+	<experimental/memory_resource>.
+	* doc/xml/manual/status_cxx2020.xml: Document status of P0777R1,
+	P0339R6, P0340R3, P1164R1 and P1357R1.
+	* doc/html/*: Regenerate.
+
+	* include/std/tuple (make_from_tuple): Use remove_reference_t instead
+	of decay_t (P0777R1).
+
 2019-05-30  Jonathan Wakely  <jwakely@redhat.com>
 
 	* doc/xml/manual/status_cxx2017.xml: Fix typo in documentation of
