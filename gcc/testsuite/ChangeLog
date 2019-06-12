@@ -1,3 +1,16 @@
+2019-06-11  Thomas Koenig  <tkoenig@gcc.gnu.org>
+	Tomáš Trnka  <trnka@scm.com>
+
+	Backport from trunk
+	PR fortran/90744
+	* gfortran.dg/deferred_character_33.f90: New test.
+	* gfortran.dg/deferred_character_33a.f90: New test.
+
+2019-06-11  Jakub Jelinek  <jakub@redhat.com>
+
+	PR c++/90810
+	* g++.dg/ext/vector37.C: New test.
+
 2019-06-07  John David Anglin  <danglin@gcc.gnu.org>
 
 	* lib/scanasm.exp (dg-function-on-line): Add pattern for hppa*-*-linux*.
