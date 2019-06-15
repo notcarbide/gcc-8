@@ -1,3 +1,113 @@
+2019-06-14  Jonathan Wakely  <jwakely@redhat.com>
+
+	Backport from mainline
+	2019-04-26  Jonathan Wakely  <jwakely@redhat.com>
+
+	* config/abi/pre/gnu.ver (GLIBCXX_3.4): Replace wildcard that matches
+	wstring::_M_replace_dispatch with more specific patterns.
+	* include/bits/fs_path.h (path::_S_convert_loc<_InputIterator>):
+	Create const std::string to avoid redundant call to _S_convert_loc
+	with non-const pointers.
+	* include/bits/locale_conv.h (__do_str_codecvt): Use if-constexpr to
+	avoid unnecessary basic_string::assign instantiations.
+
+2019-06-14  Jonathan Wakely  <jwakely@redhat.com>
+
+	Backport from mainline
+	2019-04-26  Jonathan Wakely  <jwakely@redhat.com>
+
+	* include/experimental/bits/fs_path.h
+	(path::_S_convert_loc<_InputIterator>): Create const std::string to
+	avoid redundant call to _S_convert_loc with non-const pointers.
+
+2019-06-14  Jonathan Wakely  <jwakely@redhat.com>
+
+	Backport from mainline
+	2019-05-29  Jonathan Wakely  <jwakely@redhat.com>
+
+	PR libstdc++/88881
+	* src/c++17/fs_ops.cc [_GLIBCXX_FILESYSTEM_IS_WINDOWS]
+	(status(const path&, error_code&)): Use parent_path() to remove
+	trailing slash.
+	(symlink_status(const path&, error_code&)): Duplicate workaround for
+	bug in _wstat for paths with trailing slash.
+	* testsuite/27_io/filesystem/operations/remove_all.cc: Check path
+	with trailing slash.
+	* testsuite/27_io/filesystem/operations/status.cc: Likewise.
+	* testsuite/27_io/filesystem/operations/symlink_status.cc: Likewise.
+
+2019-06-14  Jonathan Wakely  <jwakely@redhat.com>
+
+	Backport from mainline
+	2019-05-29  Jonathan Wakely  <jwakely@redhat.com>
+
+	* src/c++17/fs_path.cc (path::parent_path()): Create whole path at
+	once instead of building it iteratively.
+
+2019-06-14  Jonathan Wakely  <jwakely@redhat.com>
+
+	Backport from mainline
+	2019-05-07  Jonathan Wakely  <jwakely@redhat.com>
+
+	* doc/xml/manual/intro.xml: Fix DR 2537 and DR 2566 confusion.
+
+2019-06-14  Jonathan Wakely  <jwakely@redhat.com>
+
+	Backport from mainline
+	2019-06-14  Jonathan Wakely  <jwakely@redhat.com>
+
+	* include/std/version (__cpp_lib_bind_front): Add missing macro.
+
+2019-06-14  Jonathan Wakely  <jwakely@redhat.com>
+
+	Backport from mainline
+	2019-06-12  Jonathan Wakely  <jwakely@redhat.com>
+
+	* include/std/algorithm (__cpp_lib_parallel_algorithm): Fix value.
+	* include/std/memory (__cpp_lib_parallel_algorithm): Likewise.
+	* include/std/numeric (__cpp_lib_parallel_algorithm): Likewise.
+	* testsuite/25_algorithms/pstl/feature_test.cc: New test.
+
+2019-06-14  Jonathan Wakely  <jwakely@redhat.com>
+
+	Backport from mainline
+	2019-06-07  Jonathan Wakely  <jwakely@redhat.com>
+
+	PR libstdc++/90770
+	* src/Makefile.am (stamp-debug): Also test for missing makefile.
+	* src/Makefile.in: Regenerate.
+
+2019-06-14  Jonathan Wakely  <jwakely@redhat.com>
+
+	Backport from mainline
+	2019-05-21  Jonathan Wakely  <jwakely@redhat.com>
+
+	PR libstdc++/90252
+	* testsuite/lib/libstdc++.exp (check_effective_target_tbb-backend):
+	Use "additional_flags" to pass -ltbb to v3_target_compile command.
+	Use check_v3_target_prop_cached to cache the result of the test.
+
+	Backport from mainline
+	2019-05-20  Thomas Rodgers  <trodgers@redhat.com>
+
+	PR libstdc++/90252
+	* testsuite/lib/libstdc++.exp (check_effective_target_tbb-backend):
+	Changed v3_target_compile check from preprocess to executable.
+	Added "-ltbb" to v3_target_compile flags.
+
+	Backport from mainline
+	2019-05-20  Thomas Rodgers  <trodgers@redhat.com>
+
+	* testsuite/lib/libstdc++.exp (check_effective_target_tbb-backend):
+	Add check for Thread Building Blocks 2018 or later.
+
+2019-06-14  Jonathan Wakely  <jwakely@redhat.com>
+
+	Backport from mainline
+	2019-05-21  Jonathan Wakely  <jwakely@redhat.com>
+
+	* doc/xml/manual/shared_ptr.xml: Fix names of lock policy constants.
+
 2019-06-11  Edward Smith-Rowland  <3dw4rd@verizon.net>
 
 	Fix ConstexprIterator requirements tests - No constexpr algorithms!
@@ -8,11 +118,11 @@
 
 2019-06-09  Edward Smith-Rowland  <3dw4rd@verizon.net>
 
-        Test for C++20 p0858 - ConstexprIterator requirements.
-        * testsuite/21_strings/basic_string_view/requirements/constexpr_iter.cc:
-        New test.
-        * testsuite/23_containers/array/requirements/constexpr_iter.cc:
-        New test.
+	Test for C++20 p0858 - ConstexprIterator requirements.
+	* testsuite/21_strings/basic_string_view/requirements/constexpr_iter.cc:
+	New test.
+	* testsuite/23_containers/array/requirements/constexpr_iter.cc:
+	New test.
 
 2019-06-05  Jakub Jelinek  <jakub@redhat.com>
 
