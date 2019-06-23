@@ -1,3 +1,74 @@
+2019-06-21  Thomas Koenig  <tkoenig@gcc.gnu.org>
+
+	Backport from trunk
+	PR fortran/90937
+	* trans-types.c (get_formal_from_actual_arglist): Get symbol from
+	current namespace so it will be freed later.  If symbol is of type
+	character, get an empty character length.
+
+2019-06-20  Steven G. Kargl  <kargl@gcc.gnu.org>
+
+	Backport from mainline
+	PR fortran/90290
+	* gfortran.dg/pr90290.f90: New test.
+
+2019-06-20  Steven G. Kargl  <kargl@gcc.gnu.org>
+
+	Backport from mainline
+	PR fortran/90002
+	* gfortran.dg/pr90002.f90: New test.
+
+2019-06-20  Steven G. Kargl  <kargl@gcc.gnu.org>
+
+	Backport from mainline
+	PR fortran/89344
+	* gfortran.dg/pr89344.f90: New test.
+
+2019-06-20  Steven G. Kargl  <kargl@gcc.gnu.org>
+
+	Backport from mainline
+	PR fortran/87907
+	* gfortran.dg/pr87907.f90: New testcase.
+
+2019-06-20  Steven G. Kargl  <kargl@gcc.gnu.org>
+
+	Backport from mainline
+	PR fortran/86587
+	* gfortran.dg/pr86587.f90: New test.
+
+2019-06-20  Steven G. Kargl  <kargl@gcc.gnu.org>
+
+	Backport from mainline
+	PR fortran/77632
+	* gfortran.dg/pr77632_1.f90: New test.
+
+2019-06-20  Steven G. Kargl  <kargl@gcc.gnu.org>
+
+	Backport from mainline
+	PR fortran/69499
+	* gfortran.dg/pr69499.f90: New test.
+	* gfortran.dg/module_error_1.f90: Update dg-error string.
+
+2019-06-20  Steven G. Kargl  <kargl@gcc.gnu.org>
+
+	Backport from mainline
+	PR fortran/69398
+	* gfortran.dg/pr69398.f90: New test.
+
+2019-06-20  Steven G. Kargl  <kargl@gcc.gnu.org>
+
+	Backport from mainline
+	PR fortran/68544
+	* gfortran.dg/pr68544.f90: New test.
+	* gfortran.dg/pr85687.f90: Modify test for new error message.
+
+2019-06-20  Steven G. Kargl  <kargl@gcc.gnu.org>
+
+	Backport from mainline
+	* gfortran.dg/integer_exponentiation_4.f90: Update test.
+	* gfortran.dg/integer_exponentiation_5.F90: Ditto.
+	* gfortran.dg/no_range_check_1.f90: Ditto.
+
 2019-06-18  Harald Anlauf  <anlauf@gmx.de>
 
 	Backport from mainline
